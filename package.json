@@ -1,0 +1,17 @@
+{
+  "name": "thaitern-ideax",
+  "private": true,
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "dev:api": "npm run dev -w @ideax/api",
+    "dev:web": "npm run dev -w @ideax/web",
+    "seed": "npm run seed -w @ideax/api",
+    "typecheck": "npm run typecheck -w @ideax/contracts && npm run typecheck -w @ideax/api && npm run typecheck -w @ideax/web",
+    "test": "npm run test -w @ideax/api",
+    "test:gate0": "npm run test -w @ideax/api -- test/gate0",
+    "test:gate1": "npm run test -w @ideax/api -- test/gate1",
+    "test:gate2": "npm run test -w @ideax/api -- test/gate2",
+    "test:gate3": "npm run test -w @ideax/api -- test/gate3",
+    "e2e": "npm run e2e -w @ideax/web"
+  }
+}
