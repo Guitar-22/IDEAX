@@ -7,6 +7,7 @@
 | [`docs/APP_FLOW.md`](docs/APP_FLOW.md) | App Flow ตั้งแต่ Frontend ถึง Backend |
 | [`docs/WORK_PLAN.md`](docs/WORK_PLAN.md) | สัดส่วนงานทีละ Gate และงานที่เหลือ |
 | [`docs/VERIFICATION.md`](docs/VERIFICATION.md) | ผลตรวจความถูกต้องทีละ Gate |
+| [`docs/PERSONA_USECASES.md`](docs/PERSONA_USECASES.md) | Persona 10 คน · Use Case 110 ข้อครบ 12 Loop · Journey Map และ Backlog UX/UI |
 | [`docs/screenshots/`](docs/screenshots) | ภาพหน้าจอจาก E2E |
 | [`IDEAX-3Gate-mockup.html`](IDEAX-3Gate-mockup.html) | mockup ต้นแบบ (เปิดในเบราว์เซอร์ได้ทันที) |
 
