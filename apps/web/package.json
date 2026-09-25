@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start -p 3000",
     "typecheck": "tsc --noEmit",
-    "e2e": "playwright test"
+    "e2e": "playwright test",
+    "build:demo": "node demo/build.mjs"
   },
   "dependencies": {
     "@ideax/contracts": "0.1.0",

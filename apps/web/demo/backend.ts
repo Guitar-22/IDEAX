@@ -23,13 +23,32 @@ async function wasm(path: string) {
   return WebAssembly.compile(await res.arrayBuffer());
 }
 
+function assertWasmAllowed() {
+  try {
+    // smallest valid module: compiling it throws when the page's CSP blocks WebAssembly
+    new WebAssembly.Module(new Uint8Array([0, 97, 115, 109, 1, 0, 0, 0]));
+  } catch (e) {
+    throw new Error(`หน้านี้ไม่อนุญาตให้รัน WebAssembly (${e instanceof Error ? e.message : e})`);
+  }
+}
+
+function withTimeout<T>(p: Promise<T>, ms: number, what: string): Promise<T> {
+  return Promise.race([p, new Promise<T>((_, no) => setTimeout(() => no(new Error(`${what} ใช้เวลานานเกิน ${ms / 1000} วินาที`)), ms))]);
+}
+
 export async function startBackend(step: (msg: string) => void): Promise<LocalHandler> {
+  if (typeof WebAssembly === 'undefined') throw new Error('เบราว์เซอร์นี้ไม่รองรับ WebAssembly');
+  assertWasmAllowed();
+  return withTimeout(boot(step), 90_000, 'การเปิดฐานข้อมูล');
+}
+
+async function boot(step: (msg: string) => void): Promise<LocalHandler> {
   step('กำลังโหลดฐานข้อมูล PostgreSQL (WebAssembly)');
   const [pgliteWasmModule, initdbWasmModule, fsBundle] = await Promise.all([
     wasm('pglite.wasm'),
     wasm('initdb.wasm'),
-    fetch('pglite.data').then((r) => {
-      if (!r.ok) throw new Error(`โหลด pglite.data ไม่ได้ (${r.status})`);
+    fetch('pglite-data.wasm').then((r) => {
+      if (!r.ok) throw new Error(`โหลด pglite-data.wasm ไม่ได้ (${r.status})`);
       return r.blob();
     }),
   ]);
