@@ -9,7 +9,7 @@ import { correlationId } from './core/ids.js';
 import { errorBody, type UserRow } from './core/http.js';
 import { registerFoundation } from './modules/foundation.js';
 import { registerIdeax } from './modules/ideax/index.js';
-import { registerThaitern } from './modules/thaitern.js';
+import { registerThaitern } from './modules/thaitern/index.js';
 import { registerPartner } from './modules/partner.js';
 import { registerMarket } from './modules/market.js';
 
@@ -61,7 +61,7 @@ export async function buildApp(deps: Deps): Promise<FastifyInstance> {
 
   app.setErrorHandler((err, _req, reply) => {
     const { status, body } = errorBody(err);
-    if (status >= 500) console.error(err);
+    if (status === 500) console.error(err);
     void reply.status(status).send(body);
   });
 

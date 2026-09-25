@@ -50,8 +50,10 @@ export async function seedIdeaxSubmissions(deps: Deps) {
     ['u_nicha', CHAPTER_V3, 'ผู้ช่วย AI สำหรับขัดเกลาภาษาอังกฤษ'],
     ['u_thanawat', THANAWAT_V1, 'ไม่ได้ใช้'],
   ] as const) {
-    await db.query('insert into ai_disclosures(assignment_id, student_id, tool, part, at) values ($1, $2, $3, $4, now())', [ASSIGNMENT_ID, id, tool, 'ใช้ขัดเกลาภาษาใน §2.3 การเลือกงานอ้างอิงและการตีความทำเอง']);
-    await db.query(`insert into precheck_runs(assignment_id, student_id, content_hash, result, at) values ($1, $2, 'seed', '[]', now() - interval '1 minute')`, [ASSIGNMENT_ID, id]);
+    // use the app clock, never the database's now(): every time comparison runs on server time
+    const at = new Date(deps.clock.now().getTime() - 60_000);
+    await db.query('insert into ai_disclosures(assignment_id, student_id, tool, part, at) values ($1, $2, $3, $4, $5)', [ASSIGNMENT_ID, id, tool, 'ใช้ขัดเกลาภาษาใน §2.3 การเลือกงานอ้างอิงและการตีความทำเอง', at]);
+    await db.query(`insert into precheck_runs(assignment_id, student_id, content_hash, result, at) values ($1, $2, 'seed', '[]', $3)`, [ASSIGNMENT_ID, id, at]);
     await submitVersion(deps, { student: byId[id], assignmentId: ASSIGNMENT_ID, content, cid: 'cid-seed01' });
   }
   await queue.drain();
