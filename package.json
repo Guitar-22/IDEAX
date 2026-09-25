@@ -1,7 +1,10 @@
 {
   "name": "thaitern-ideax",
   "private": true,
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "dev:api": "npm run dev -w @ideax/api",
     "dev:web": "npm run dev -w @ideax/web",
@@ -12,6 +15,7 @@
     "test:gate1": "npm run test -w @ideax/api -- test/gate1",
     "test:gate2": "npm run test -w @ideax/api -- test/gate2",
     "test:gate3": "npm run test -w @ideax/api -- test/gate3",
-    "e2e": "npm run e2e -w @ideax/web"
+    "e2e": "npm run e2e -w @ideax/web",
+    "test:pg": "TEST_PG_ADMIN_URL=${TEST_PG_ADMIN_URL:-postgres://postgres:postgres@localhost:5432/postgres} npm run test -w @ideax/api"
   }
 }

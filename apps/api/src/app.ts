@@ -10,8 +10,8 @@ import { errorBody, type UserRow } from './core/http.js';
 import { registerFoundation } from './modules/foundation.js';
 import { registerIdeax } from './modules/ideax/index.js';
 import { registerThaitern } from './modules/thaitern/index.js';
-import { registerPartner } from './modules/partner.js';
-import { registerMarket } from './modules/market.js';
+import { registerPartner } from './modules/partner/index.js';
+import { registerMarket } from './modules/market/index.js';
 
 export interface Deps {
   db: Db;

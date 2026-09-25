@@ -50,6 +50,7 @@ export interface CaseRow {
   challenge_brief: string;
   status: string;
   stages: number[];
+  mask_terms: string[];
   reviewed_by: string | null;
 }
 
