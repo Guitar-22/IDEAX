@@ -37,7 +37,7 @@ const JOURNEY_STEP: Record<AttemptState, string> = {
   FIRST_DRAFT: '4a',
   LEARNING: '4',
   READY_TO_UNLOCK: '5',
-  IN_PROGRESS: '7',
+  IN_PROGRESS: '6',
   PUSHBACK: '8',
   FINALIZING: '9',
   SUBMITTED: '13',

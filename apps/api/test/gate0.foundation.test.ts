@@ -2,6 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { makeHarness, type Harness } from './helpers.js';
 import { splitSentences, wordCount } from '../src/core/text.js';
 import { signToken, verifyToken } from '../src/core/auth.js';
+import { recoverJobs } from '../src/recover.js';
 
 let h: Harness;
 beforeAll(async () => {
@@ -134,6 +135,17 @@ describe('Gate 0 · HTTP contract', () => {
     expect(unauth.body).toMatchObject({ code: 'UNAUTHENTICATED', message_th: expect.any(String) });
   });
 
+  it('allows the browser app to PUT and DELETE across origins (CORS preflight)', async () => {
+    const r = await h.app.inject({
+      method: 'OPTIONS',
+      url: '/v1/assignments/x/disclosure',
+      headers: { origin: 'http://localhost:3000', 'access-control-request-method': 'PUT', 'access-control-request-headers': 'content-type,authorization,x-correlation-id' },
+    });
+    expect(r.statusCode).toBe(204);
+    expect(String(r.headers['access-control-allow-methods'])).toMatch(/PUT/);
+    expect(String(r.headers['access-control-allow-methods'])).toMatch(/DELETE/);
+  });
+
   it('returns 400 VALIDATION for malformed bodies', async () => {
     const r = await h.call('POST', '/v1/auth/signup', { body: { name: '' } });
     expect(r.status).toBe(400);
@@ -145,5 +157,22 @@ describe('Gate 0 · HTTP contract', () => {
     expect(ok.body.studentCardVerified).toBe(true);
     const no = await h.call('POST', '/v1/identity/student-card', { as: 'u_teacher', body: { fileName: 'card.jpg' } });
     expect(no.status).toBe(403);
+  });
+});
+
+describe('Gate 0 · restart safety', () => {
+  it('re-queues unfinished AI jobs on boot so nothing stays QUEUED forever', async () => {
+    const { seedIdeaxCatalog, seedIdeaxSubmissions } = await import('../src/seed/ideax.js');
+    const h2 = await makeHarness({ seed: async (d) => { await seedIdeaxCatalog(d); await seedIdeaxSubmissions(d); } });
+    // simulate a crash: the run is back to QUEUED and its results are gone
+    await h2.db.query(`delete from review_items`);
+    await h2.db.query(`delete from item_proposals`);
+    await h2.db.query(`delete from anchors`);
+    await h2.db.query(`update analysis_runs set status = 'QUEUED'`);
+    expect(await recoverJobs(h2.deps)).toBe(2);
+    await h2.queue.drain();
+    const runs = await h2.db.query(`select status from analysis_runs`);
+    expect(runs.every((r) => r.status === 'COMPLETED')).toBe(true);
+    await h2.close();
   });
 });

@@ -40,7 +40,7 @@ export function createQueue(opts?: { backoffMs?: (n: number) => number; maxAttem
 
 export async function buildApp(deps: Deps): Promise<FastifyInstance> {
   const app = Fastify({ logger: false, bodyLimit: 5 * 1024 * 1024 });
-  await app.register(cors, { origin: true, exposedHeaders: ['x-correlation-id'] });
+  await app.register(cors, { origin: true, methods: ['GET', 'HEAD', 'POST', 'PUT', 'DELETE'], exposedHeaders: ['x-correlation-id'] });
 
   app.decorateRequest('user', null);
   app.decorateRequest('cid', '');

@@ -4,6 +4,7 @@ import { systemClock } from './core/clock.js';
 import { MockAiProvider } from './ai/mock.js';
 import { registerJobs } from './jobs.js';
 import { seedAll } from './seed/index.js';
+import { recoverJobs } from './recover.js';
 
 const port = Number(process.env.PORT ?? 4000);
 const devTools = process.env.NODE_ENV !== 'production' || process.env.DEV_TOOLS === '1';
@@ -20,6 +21,9 @@ if (count === 0 && process.env.SEED !== '0') {
   await seedAll(deps);
   console.log('seeded demo data');
 }
+
+const recovered = await recoverJobs(deps);
+if (recovered) console.log(`re-queued ${recovered} unfinished AI jobs`);
 
 const app = await buildApp(deps);
 await app.listen({ port, host: '0.0.0.0' });

@@ -204,7 +204,7 @@ export function registerPartner(app: FastifyInstance, deps: Deps) {
       );
       await move(q, c, 'EXPERT_REVIEW', u, req.cid, `draft v${n + 1} · ใช้ ${usable.length} ไฟล์ · กันออก ${excluded} ไฟล์ (no_learner/pii/หมดอายุ)`);
     });
-    return { versionNo: n + 1, pages: booklet.length, dataRoom: dataRoom.length, personas: personas.length, questions: questions.length, excluded };
+    return { status: 'EXPERT_REVIEW', versionNo: n + 1, pages: booklet.length, dataRoom: dataRoom.length, personas: personas.length, questions: questions.length, excluded };
   });
 
   /** Learner-facing preview for owner/reviewer: exactly what learners will see. */
