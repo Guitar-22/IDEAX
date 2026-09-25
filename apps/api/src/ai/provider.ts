@@ -21,6 +21,8 @@ export interface ItemHints {
   cues?: string[];
   /** material the item depends on */
   needs?: 'figure_text' | 'reference_list' | 'other_chapter' | 'section_structure';
+  /** item is part of the advisory precheck */
+  precheck?: boolean;
   /** student-facing text when present / absent */
   fbPresent?: string;
   fbAbsent?: string;

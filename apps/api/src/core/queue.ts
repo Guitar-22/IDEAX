@@ -13,15 +13,15 @@ interface Job {
   notBefore: number;
 }
 
+export type ExhaustedHandler = (payload: any, err: unknown, cid: string) => Promise<void>;
+
 export interface QueueOptions {
   maxAttempts: number;
   backoffMs: (attempt: number) => number;
-  /** Called when a job fails for the last time. */
-  onExhausted?: (name: string, payload: any, err: unknown, cid: string) => Promise<void>;
 }
 
 export class JobQueue {
-  private handlers = new Map<string, JobHandler>();
+  private handlers = new Map<string, { fn: JobHandler; onExhausted?: ExhaustedHandler }>();
   private jobs: Job[] = [];
   private running = false;
   private idleWaiters: Array<() => void> = [];
@@ -29,12 +29,9 @@ export class JobQueue {
 
   constructor(private opts: QueueOptions) {}
 
-  handle(name: string, fn: JobHandler) {
-    this.handlers.set(name, fn);
-  }
-
-  setExhaustedHandler(fn: NonNullable<QueueOptions['onExhausted']>) {
-    this.opts.onExhausted = fn;
+  /** onExhausted runs once when the job has failed maxAttempts times. */
+  handle(name: string, fn: JobHandler, onExhausted?: ExhaustedHandler) {
+    this.handlers.set(name, { fn, onExhausted });
   }
 
   enqueue(name: string, payload: unknown, cid: string) {
@@ -69,15 +66,15 @@ export class JobQueue {
       const idx = this.jobs.findIndex((j) => j.notBefore <= now);
       if (idx < 0) break;
       const job = this.jobs.splice(idx, 1)[0];
-      const fn = this.handlers.get(job.name);
-      if (!fn) continue;
+      const h = this.handlers.get(job.name);
+      if (!h) continue;
       try {
-        await fn(job.payload, { attempt: job.attempt, cid: job.cid });
+        await h.fn(job.payload, { attempt: job.attempt, cid: job.cid });
       } catch (err) {
         if (job.attempt < this.opts.maxAttempts) {
           this.jobs.push({ ...job, attempt: job.attempt + 1, notBefore: Date.now() + this.opts.backoffMs(job.attempt) });
-        } else if (this.opts.onExhausted) {
-          await this.opts.onExhausted(job.name, job.payload, err, job.cid).catch(() => {});
+        } else if (h.onExhausted) {
+          await h.onExhausted(job.payload, err, job.cid).catch((e) => console.error('onExhausted failed', e));
         }
       }
     }
