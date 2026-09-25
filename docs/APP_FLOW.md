@@ -216,11 +216,11 @@ flowchart LR
 |---|---|---|
 | Frontend | Next.js (App Router) + TypeScript, PWA, TanStack Query, Zod | ต้นแบบเดิมอยู่บน Vercel (`thaitern.vercel.app`), กลุ่มเป้าหมายใช้มือถือ/แท็บเล็ตเป็นหลัก |
 | UI tokens | จาก mockup: `--proposed`, `--verified`, `--attention`, brand navy/blue/teal/green, ฟอนต์ Anuphan | กฎสีเป็นกฎข้อมูล |
-| Backend | NestJS (TypeScript) modular monolith | แชร์ schema กับ frontend, แยก module ตามข้อ 3 |
+| Backend | Fastify (TypeScript) modular monolith — โค้ดจริงใช้ Fastify แทน NestJS ที่เสนอไว้เดิม เพราะเบาและทดสอบผ่าน `inject` ได้เร็ว | แชร์ schema กับ frontend (`packages/contracts`), แยก module ตาม Gate |
 | State machine | XState หรือ FSM table ใน DB + guard ฝั่ง server | ตามรายงาน: FSM + Server-side Logic Engine ตรวจ Data Schema และล็อกสถานะ |
 | DB | PostgreSQL บน AIS Cloud | ตามแผนการเงิน (15,000 บาท/เดือน) |
 | Event store | ตาราง `trace_event` append-only (Postgres) ในระยะแรก | ย้ายไป stream แยกเมื่อขยาย 💡 |
-| Queue | Redis + BullMQ | retry งาน AI |
+| Queue | Redis + BullMQ (ตอนนี้ใช้ queue ในโปรเซสที่มี interface เดียวกัน) | retry งาน AI |
 | AI | LLM ผ่าน provider abstraction, **ระบุโมเดลตามงาน** (รายงานใช้ Gemini ในต้นแบบ และคิดต้นทุนเคสจาก Qwen3.6-35B-A3B บน DeepInfra) | ตาราง 37 ข้อ "โมเดล AI" ให้ระบุตามงานให้ชัด, ใช้บริบท ไม่ fine-tune ด้วยข้อมูล SME |
 | Streaming | Server-Sent Events จาก AI service ผ่าน BFF | persona โต้แย้งแบบเรียลไทม์ (ขั้น 7–8, Stage 7) |
 | Storage | S3-compatible | booklet, สไลด์, วิดีโอ, คลิปเสียง; booklet ไม่เปิด URL ตรง |
